@@ -44,7 +44,7 @@ class UsersController {
         }
 
         if (email && !UsersController.emailRegex.test(email)) {
-            throw new AppError("Precisa ser um endereço de email válido")
+            throw new AppError("Precisa ser um endereço de e-mail válido")
         }
 
         user.name = name ?? user.name
