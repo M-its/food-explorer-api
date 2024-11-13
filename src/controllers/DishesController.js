@@ -4,6 +4,7 @@ const AppError = require("../utils/AppError")
 class DishesController {
     async create(req, res) {
         const { title, category, description, ingredients, price } = req.body
+        const imageFilename = null
 
         if (!title || !description || !category || !price || !ingredients) {
             throw new AppError("All fields are required")
@@ -14,6 +15,7 @@ class DishesController {
             category,
             description,
             price,
+            image: imageFilename,
         })
 
         const ingredientsInsert = ingredients.map((ingredient) => {
