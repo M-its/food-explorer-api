@@ -25,5 +25,6 @@ dishesRoutes.put(
     dishesController.update
 )
 dishesRoutes.delete("/:id", dishesController.delete)
+dishesRoutes.get("/", dishesController.index)
 
 module.exports = dishesRoutes

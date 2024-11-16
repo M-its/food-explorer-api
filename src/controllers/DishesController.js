@@ -65,7 +65,50 @@ class DishesController {
         return res.json()
     }
 
-    async index() {}
+    async index(req, res) {
+        const { title, category, ingredients } = req.query
+
+        let dishes
+
+        if (ingredients) {
+            const filterIngredients = ingredients
+                .split(",")
+                .map((ingredient) => ingredient.trim().toLowerCase())
+
+            dishes = await knex("dishes")
+                .select(
+                    "dishes.id",
+                    "dishes.title",
+                    "dishes.description",
+                    "dishes.price",
+                    "dishes.category"
+                )
+                .distinct()
+                .join("ingredients", "dishes.id", "ingredients.dish_id")
+                .whereRaw("LOWER(ingredients.name) IN (?)", filterIngredients)
+                .orderBy("dishes.category")
+                .orderBy("dishes.title")
+        } else if (title) {
+            dishes = await knex("dishes")
+                .select("id", "title", "description", "price", "category")
+                .whereRaw("LOWER(title) LIKE LOWER(?)", [`%${title}%`])
+                .orderBy("category")
+                .orderBy("title")
+        } else if (category) {
+            dishes = await knex("dishes")
+                .select("id", "title", "description", "price", "category")
+                .whereRaw("LOWER(category) LIKE LOWER(?)", [`%${category}%`])
+                .orderBy("category")
+                .orderBy("title")
+        } else {
+            dishes = await knex("dishes")
+                .select("title", "description", "price", "category")
+                .orderBy("category")
+                .orderBy("title")
+        }
+
+        return res.json(dishes)
+    }
 }
 
 module.exports = DishesController
