@@ -17,15 +17,12 @@ dishesRoutes.post(
     upload.single("dish_image"),
     dishesController.create
 )
-dishesRoutes.get("/", dishesController.index)
-dishesRoutes.patch(
+dishesRoutes.get("/:id", dishesController.show)
+dishesRoutes.put(
     "/:id",
     verifyUserAuthorization("admin"),
     upload.single("dish_image"),
-    (req, res) => {
-        console.log(req.file.filename)
-        return res.json()
-    }
+    dishesController.update
 )
 
 module.exports = dishesRoutes
