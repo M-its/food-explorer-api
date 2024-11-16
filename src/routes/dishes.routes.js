@@ -24,5 +24,6 @@ dishesRoutes.put(
     upload.single("dish_image"),
     dishesController.update
 )
+dishesRoutes.delete("/:id", dishesController.delete)
 
 module.exports = dishesRoutes
