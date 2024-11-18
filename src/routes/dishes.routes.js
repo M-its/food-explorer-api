@@ -18,7 +18,7 @@ dishesRoutes.post(
     dishesController.create
 )
 dishesRoutes.get("/:id", dishesController.show)
-dishesRoutes.put(
+dishesRoutes.patch(
     "/:id",
     verifyUserAuthorization("admin"),
     upload.single("dish_image"),

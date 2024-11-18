@@ -55,7 +55,46 @@ class DishesController {
         })
     }
 
-    async update() {}
+    async update(req, res) {
+        const { title, category, description, price } = req.body
+        const { id } = req.params
+        const ingredients = JSON.parse(req.body.ingredients)
+        const dishImageFilename = req.file.filename
+
+        const diskStorage = new DiskStorage()
+
+        const dish = await knex("dishes").where({ id }).first()
+
+        if (!dish) {
+            throw new AppError("Dish not found")
+        }
+
+        if (dish.image) {
+            await diskStorage.deleteFile(dish.image)
+        }
+
+        const filename = await diskStorage.saveFile(dishImageFilename)
+
+        dish.title = title ?? dish.title
+        dish.category = category ?? dish.category
+        dish.description = description ?? dish.description
+        dish.price = price ?? dish.price
+        dish.image = filename
+
+        await knex("dishes").where({ id }).update(dish)
+        await knex("ingredients").where({ dish_id: id }).delete()
+
+        const ingredientsInsert = ingredients.map((ingredient) => {
+            return {
+                dish_id: id,
+                name: ingredient,
+            }
+        })
+
+        await knex("ingredients").insert(ingredientsInsert)
+
+        return res.json()
+    }
 
     async delete(req, res) {
         const { id } = req.params
