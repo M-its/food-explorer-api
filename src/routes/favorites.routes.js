@@ -9,8 +9,8 @@ const favoriteDishesController = new FavoriteDishesController()
 favoriteRoutes.use(ensureAuthenticated)
 
 favoriteRoutes.post("/:dish_id", favoriteDishesController.create)
-favoriteRoutes.post("/:id", favoriteDishesController.show)
+favoriteRoutes.get("/:id", favoriteDishesController.show)
 favoriteRoutes.post("/", favoriteDishesController.index)
-favoriteRoutes.post("/:id", favoriteDishesController.delete)
+favoriteRoutes.delete("/:id", favoriteDishesController.delete)
 
 module.exports = favoriteRoutes
