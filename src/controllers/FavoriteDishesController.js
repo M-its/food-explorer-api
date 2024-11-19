@@ -56,7 +56,29 @@ class FavoriteDishesController {
         })
     }
 
-    async index(req, res) {}
+    async index(req, res) {
+        const user_id = req.user.id
+
+        const favorites = await knex("favorites")
+            .select([
+                "favorites.id",
+                "favorites.user_id",
+                "dishes.id as dish_id",
+                "dishes.title",
+                "dishes.description",
+                "dishes.price",
+                "dishes.image",
+            ])
+            .where({ user_id })
+            .innerJoin("dishes", "dishes.id", "favorites.dish_id")
+            .orderBy("dishes.title")
+
+        if (!favorites) {
+            throw new AppError("You have no favorites added")
+        }
+
+        res.json(favorites)
+    }
 }
 
 module.exports = FavoriteDishesController
