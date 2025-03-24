@@ -59,7 +59,7 @@ class DishesController {
         const { title, category, description, price } = req.body
         const { id } = req.params
         const ingredients = JSON.parse(req.body.ingredients)
-        const dishImageFilename = req.file.filename
+        const dishImageFilename = req.file ? req.file.filename : null
 
         const diskStorage = new DiskStorage()
 
@@ -69,19 +69,19 @@ class DishesController {
             throw new AppError("Dish not found")
         }
 
-        if (dish.image) {
-            await diskStorage.deleteFile(dish.image)
+        if (dishImageFilename) {
+            if (dish.image) {
+                await diskStorage.deleteFile(dish.image)
+            }
+            const filename = await diskStorage.saveFile(dishImageFilename)
+            dish.image = filename
         }
-
-        const filename = await diskStorage.saveFile(dishImageFilename)
 
         dish.title = title ?? dish.title
         dish.category = category ?? dish.category
         dish.description = description ?? dish.description
         dish.price = price ?? dish.price
-        dish.image = filename
 
-        await knex("dishes").where({ id }).update(dish)
         await knex("ingredients").where({ dish_id: id }).delete()
 
         const ingredientsInsert = ingredients.map((ingredient) => {
@@ -92,6 +92,7 @@ class DishesController {
         })
 
         await knex("ingredients").insert(ingredientsInsert)
+        await knex("dishes").update(dish).where({ id })
 
         return res.json()
     }
@@ -105,7 +106,7 @@ class DishesController {
     }
 
     async index(req, res) {
-        const { title, category, ingredients } = req.query
+        const { title, image, category, ingredients } = req.query
 
         let dishes
 
@@ -117,6 +118,7 @@ class DishesController {
             dishes = await knex("dishes")
                 .select(
                     "dishes.id",
+                    "dishes.image",
                     "dishes.title",
                     "dishes.description",
                     "dishes.price",
@@ -129,19 +131,33 @@ class DishesController {
                 .orderBy("dishes.title")
         } else if (title) {
             dishes = await knex("dishes")
-                .select("id", "title", "description", "price", "category")
+                .select(
+                    "id",
+                    "image",
+                    "title",
+                    "description",
+                    "price",
+                    "category"
+                )
                 .whereRaw("LOWER(title) LIKE LOWER(?)", [`%${title}%`])
                 .orderBy("category")
                 .orderBy("title")
         } else if (category) {
             dishes = await knex("dishes")
-                .select("id", "title", "description", "price", "category")
+                .select(
+                    "id",
+                    "image",
+                    "title",
+                    "description",
+                    "price",
+                    "category"
+                )
                 .whereRaw("LOWER(category) LIKE LOWER(?)", [`%${category}%`])
                 .orderBy("category")
                 .orderBy("title")
         } else {
             dishes = await knex("dishes")
-                .select("title", "description", "price", "category")
+                .select("title", "image", "description", "price", "category")
                 .orderBy("category")
                 .orderBy("title")
         }

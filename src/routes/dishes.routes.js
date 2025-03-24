@@ -8,6 +8,7 @@ const verifyUserAuthorization = require("../middlewares/verifyUserAuthorizarion"
 
 const dishesRoutes = Router()
 const upload = multer(uploadConfig.MULTER)
+
 const dishesController = new DishesController()
 dishesRoutes.use(ensureAuthenticated)
 
