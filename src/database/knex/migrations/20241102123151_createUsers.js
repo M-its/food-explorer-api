@@ -6,12 +6,12 @@ exports.up = (knex) =>
         table.text("password").notNullable()
 
         table
-            .enum("role", ["admin", "user"], {
+            .enum("role", ["admin", "customer"], {
                 userNative: true,
-                enumName: "role",
+                enumName: "roles",
             })
             .notNullable()
-            .default("user")
+            .default("customer")
 
         table.timestamp("created_at").default(knex.fn.now())
         table.timestamp("updated_at").default(knex.fn.now())

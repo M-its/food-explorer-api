@@ -14,18 +14,22 @@ dishesRoutes.use(ensureAuthenticated)
 
 dishesRoutes.post(
     "/",
-    verifyUserAuthorization("admin"),
+    verifyUserAuthorization(["admin"]),
     upload.single("dish_image"),
     dishesController.create
 )
 dishesRoutes.get("/:id", dishesController.show)
 dishesRoutes.patch(
     "/:id",
-    verifyUserAuthorization("admin"),
+    verifyUserAuthorization(["admin"]),
     upload.single("dish_image"),
     dishesController.update
 )
-dishesRoutes.delete("/:id", dishesController.delete)
+dishesRoutes.delete(
+    "/:id",
+    verifyUserAuthorization(["admin"]),
+    dishesController.delete
+)
 dishesRoutes.get("/", dishesController.index)
 
 module.exports = dishesRoutes
